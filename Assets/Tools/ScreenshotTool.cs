@@ -30,6 +30,8 @@ public class ScreenshotTool : EditorWindow
     public Texture2D watermark;
     public bool flashEnabled = true;  // Flash toggle setting
     public bool livePreviewEnabled;
+    public Vector2 aspectRatio = new Vector2(16, 9);
+
 
 
     // Post-Processing Settings
@@ -166,6 +168,37 @@ public class ScreenshotTool : EditorWindow
         string extension = formats[selectedFormat].ToLower();
         string fileName = $"{fileTag}_{System.DateTime.Now:yyyyMMdd_HHmmss}.{extension}";
         return Path.Combine(folderPath, fileName);
+    }
+
+
+    /// <summary>
+    /// Force the active Scene View window to match the user’s chosen aspect ratio.
+    /// Only works reliably if Scene View is floating (undocked).
+    /// </summary>
+    public void ApplySceneViewAspectRatio()
+    {
+        SceneView sceneView = SceneView.lastActiveSceneView;
+        if (sceneView == null)
+        {
+            UnityEngine.Debug.LogWarning("No active Scene View to resize!");
+            return;
+        }
+
+        // The Scene View is an EditorWindow, so we can tweak its position rect.
+        Rect currentPos = sceneView.position;
+
+        // Decide which dimension to keep as your "base." 
+        // Let's keep height the same, adjust width to match aspect ratio:
+        float desiredAspect = aspectRatio.x / Mathf.Max(0.001f, aspectRatio.y);
+        float newWidth = currentPos.height * desiredAspect;
+
+        // Now apply that new width to the Scene View window
+        currentPos.width = newWidth;
+        sceneView.position = currentPos;
+
+        // Force an immediate repaint
+        sceneView.Repaint();
+        UnityEngine.Debug.Log($"Scene View resized to ~{newWidth} x {currentPos.height} for aspect ratio {aspectRatio.x}:{aspectRatio.y}");
     }
 
     #endregion

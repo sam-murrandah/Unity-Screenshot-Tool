@@ -58,7 +58,24 @@ public class ScreenshotToolUI
             GUILayout.Label(new GUIContent("Preview", "Preview the dimensions of the screenshot"), EditorStyles.boldLabel);
             screenshotTool.DisplayPreviewResolution();
             
-            
+            // e.g. at the bottom of capture settings
+
+            EditorGUILayout.Space();
+
+            GUILayout.Label("Scene View Aspect Ratio", EditorStyles.boldLabel);
+
+            // Let the user pick or enter a ratio (16:9, 1:1, etc.)
+            screenshotTool.aspectRatio = EditorGUILayout.Vector2Field(
+                new GUIContent("Aspect Ratio", "e.g. 16:9 or 1:1"),
+                screenshotTool.aspectRatio
+            );
+
+            // Button to actually resize the scene view
+            if (GUILayout.Button("Apply Scene View Aspect"))
+            {
+                screenshotTool.ApplySceneViewAspectRatio();
+            }
+
             EditorGUI.indentLevel--;
             DrawHorizontalLine();
         }
