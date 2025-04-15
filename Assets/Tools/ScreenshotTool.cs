@@ -36,8 +36,11 @@ public class ScreenshotTool : EditorWindow
     public bool radiationMode = false;
     public float vignetteIntensity = 0f;
     public float noiseAmount = 0f;
+    public float saturationLevel = 1f; // Default to 1 (normal saturation)
     public Effect selectedEffect = Effect.None;
     public ColourblindMode colourblindMode = ColourblindMode.Normal;
+    public Color tintColor = Color.white; // Default to no tint (white)
+
 
     // UI State
     private RenderTexture previewTexture;
@@ -244,8 +247,8 @@ public class ScreenshotTool : EditorWindow
     (int width, int height) GetScreenshotDimensions(SceneView sceneView)
     {
         Rect sceneViewRect = sceneView.position;
-        int width = Mathf.FloorToInt(sceneViewRect.width) * resolutionMultiplier;
-        int height = Mathf.FloorToInt(sceneViewRect.height) * resolutionMultiplier;
+        int width = (int)(Mathf.FloorToInt(sceneViewRect.width) * resolutionMultiplier);
+        int height = (int)(Mathf.FloorToInt(sceneViewRect.height) * resolutionMultiplier);
         return (width, height);
     }
 
@@ -323,6 +326,8 @@ public class ScreenshotTool : EditorWindow
         if (radiationMode) ApplyRadiationMode(screenshot);
         if (noiseAmount > 0) ApplyNoise(screenshot, noiseAmount);
         ApplyVignette(screenshot, vignetteIntensity);
+        ApplyTint(screenshot, tintColor);
+        if (saturationLevel != 1f) ApplySaturation(screenshot, saturationLevel);
         if (colourblindMode != ColourblindMode.Normal) ApplyColourblindFilter(screenshot, colourblindMode);
         if (watermark != null) ApplyWatermark(screenshot);
 

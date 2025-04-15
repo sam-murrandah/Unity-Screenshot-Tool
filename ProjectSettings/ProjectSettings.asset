@@ -838,8 +838,8 @@ PlayerSettings:
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: GPG315_1_1031741
-  metroPackageVersion: 
+  metroPackageName: GPG31511031741
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -847,7 +847,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: GPG315_1_1031741
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: GPG315_1_1031741
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0

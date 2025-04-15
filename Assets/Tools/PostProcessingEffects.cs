@@ -84,6 +84,49 @@ public static class PostProcessingEffects
         texture.Apply();
     }
 
+    public static void ApplySaturation(Texture2D texture, float saturation)
+    {
+        Color[] pixels = texture.GetPixels();
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            Color p = pixels[i];
+
+            // Calculate the grayscale luminance value
+            float gray = p.r * 0.299f + p.g * 0.587f + p.b * 0.114f;
+
+            // Calculate the oversaturated colors by scaling the difference from gray
+            float r = gray + (p.r - gray) * saturation;
+            float g = gray + (p.g - gray) * saturation;
+            float b = gray + (p.b - gray) * saturation;
+
+            // Clamp the colors to valid ranges (0 to 1)
+            pixels[i] = new Color(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b), p.a);
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+    }
+
+    public static void ApplyTint(Texture2D texture, Color tintColor)
+    {
+        Color[] pixels = texture.GetPixels();
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            // Multiply each pixel by the tint color
+            pixels[i] = pixels[i] * tintColor;
+            // Clamp to ensure valid RGB values
+            pixels[i].r = Mathf.Clamp01(pixels[i].r);
+            pixels[i].g = Mathf.Clamp01(pixels[i].g);
+            pixels[i].b = Mathf.Clamp01(pixels[i].b);
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+    }
+
+
     private static void ApplyGrayscale(Texture2D texture)
     {
         Color[] pixels = texture.GetPixels();

@@ -47,7 +47,7 @@ public class ScreenshotToolUI
 
             screenshotTool.resolutionMultiplier = EditorGUILayout.IntSlider(
                 new GUIContent("Resolution Multiplier", "Adjusts the resolution scale of the screenshot"),
-                screenshotTool.resolutionMultiplier, 1, 5
+                screenshotTool.resolutionMultiplier, 1, 10
             );
 
             screenshotTool.selectedFormat = EditorGUILayout.Popup(
@@ -57,6 +57,7 @@ public class ScreenshotToolUI
 
             GUILayout.Label(new GUIContent("Preview", "Preview the dimensions of the screenshot"), EditorStyles.boldLabel);
             screenshotTool.DisplayPreviewResolution();
+            
             
             EditorGUI.indentLevel--;
             DrawHorizontalLine();
@@ -122,8 +123,6 @@ public class ScreenshotToolUI
         GUILayout.Space(10);
     }
 
-
-
     public void DrawPostProcessingSettings(ref bool showPostProcSettings)
     {
         showPostProcSettings = EditorGUILayout.Foldout(showPostProcSettings, new GUIContent("Post Processing Settings", "Optional post processing settings"));
@@ -141,6 +140,18 @@ public class ScreenshotToolUI
                 new GUIContent("Noise Amount", "Adds random noise to the image"),
                 screenshotTool.noiseAmount, 0f, 1f
             );
+
+            screenshotTool.saturationLevel = EditorGUILayout.Slider(
+                new GUIContent("Saturation", "Adjust the color saturation of the screenshot"),
+                screenshotTool.saturationLevel, 0f, 2f
+            );
+ 
+            // Add a color picker for the tint color
+            screenshotTool.tintColor = EditorGUILayout.ColorField(
+                new GUIContent("Tint Color", "Choose a color to tint the screenshot"),
+                screenshotTool.tintColor
+            );
+
 
             screenshotTool.selectedEffect = (Effect)EditorGUILayout.EnumPopup(
                 new GUIContent("Post-Processing", "Choose a post-processing effect to apply"),
