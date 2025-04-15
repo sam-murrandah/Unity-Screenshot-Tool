@@ -80,6 +80,7 @@ public class ScreenshotTool : EditorWindow
     ui.DrawLivePreview();
 
     EditorGUILayout.EndScrollView();
+    
 }
 
     [MenuItem("Tools/Quick Screenshot Tool")]

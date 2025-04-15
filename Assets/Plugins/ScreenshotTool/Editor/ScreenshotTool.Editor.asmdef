@@ -1,8 +1,10 @@
 {
-    "name": "ScreenshotTool",
+    "name": "ScreenshotTool.Editor",
     "rootNamespace": "",
     "references": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -16,7 +16,7 @@ public static class PostProcessingEffects
     #region Post Processing Presets
     public static void ApplyEffect(Texture2D texture, Effect effect)
     {
-        switch (effect)
+        switch (effect) 
         {
             case Effect.Grayscale:
                 ApplyGrayscale(texture);
