@@ -307,10 +307,21 @@ public class ScreenshotTool : EditorWindow
     }
 
     // ----- Live Preview Logic -----
+    private Texture2D cachedPreviewTexture;
+    private double lastPreviewUpdateTime = 0f;
+    private const float previewUpdateInterval = 0.25f; // Seconds between updates
 
+    /// <summary>
+    /// Displays a live preview of what the screenshot would look like.
+    /// This version is performance-optimised by only updating at a set interval,
+    /// rather than on every frame like OnGUI normally does.
+    /// </summary>
     internal void DisplayLivePreview()
     {
-        if (!livePreviewEnabled) return;  // Skip if live preview is disabled
+        // If the live preview toggle is off, don't show anything
+        if (!livePreviewEnabled) return;
+
+        // Grab the current active Scene View (usually the main editor camera view)
         SceneView sceneView = SceneView.lastActiveSceneView;
         if (sceneView == null || sceneView.camera == null)
         {
@@ -318,13 +329,30 @@ public class ScreenshotTool : EditorWindow
             return;
         }
 
+        // ----------------------------
+        // STEP 1: Throttle how often we update the preview
+        // ----------------------------
+
+        // Get the current editor runtime in seconds
+        double currentTime = EditorApplication.timeSinceStartup;
+
+        // Only update if enough time has passed (defined by previewUpdateInterval)
+        bool shouldUpdate = (currentTime - lastPreviewUpdateTime) > previewUpdateInterval;
+
+        // ----------------------------
+        // STEP 2: Calculate dimensions based on Scene View & window size
+        // ----------------------------
+
         var (sceneWidth, sceneHeight) = GetScreenshotDimensions(sceneView);
         float aspectRatio = (float)sceneWidth / sceneHeight;
 
-        float availableWidth = position.width - 20;  // Subtracting padding
-        float availableHeight = position.height - 100; // Layout adjustments
+        // Use some padding to avoid UI overlaps
+        float availableWidth = position.width - 20;
+        float availableHeight = position.height - 100;
 
         float previewWidth, previewHeight;
+
+        // Keep the preview box within the bounds of the editor window
         if (availableWidth / aspectRatio <= availableHeight)
         {
             previewWidth = availableWidth;
@@ -336,29 +364,56 @@ public class ScreenshotTool : EditorWindow
             previewWidth = availableHeight * aspectRatio;
         }
 
-        if (previewTexture == null ||
-            previewTexture.width != (int)previewWidth ||
-            previewTexture.height != (int)previewHeight)
+        // ----------------------------
+        // STEP 3: Only regenerate the preview if it’s time or size changed
+        // ----------------------------
+
+        if (shouldUpdate || cachedPreviewTexture == null ||
+            cachedPreviewTexture.width != (int)previewWidth ||
+            cachedPreviewTexture.height != (int)previewHeight)
         {
+            // Clear out the old preview render texture if needed
             if (previewTexture != null) previewTexture.Release();
+
+            // Set up a new RenderTexture with the correct size
             previewTexture = new RenderTexture((int)previewWidth, (int)previewHeight, 24);
+
+            // Tell the Scene View camera to render to our RenderTexture
+            sceneView.camera.targetTexture = previewTexture;
+            sceneView.camera.Render(); // Manually render the camera
+            sceneView.camera.targetTexture = null;
+
+            // Convert the RenderTexture into a Texture2D that we can display
+            RenderTexture.active = previewTexture;
+            Texture2D tempTexture = new Texture2D((int)previewWidth, (int)previewHeight, TextureFormat.RGB24, false);
+            tempTexture.ReadPixels(new Rect(0, 0, previewWidth, previewHeight), 0, 0);
+            tempTexture.Apply();
+            RenderTexture.active = null;
+
+            // Optional: apply post-processing to the preview so users see the full effect
+            AddAllEffects(tempTexture);
+
+            // Clean up the previous cached preview
+            if (cachedPreviewTexture != null)
+            {
+                DestroyImmediate(cachedPreviewTexture);
+            }
+
+            // Store the newly generated preview
+            cachedPreviewTexture = tempTexture;
+
+            // Record the time we last updated
+            lastPreviewUpdateTime = currentTime;
         }
 
-        sceneView.camera.targetTexture = previewTexture;
-        sceneView.camera.Render();
-        sceneView.camera.targetTexture = null;
+        // ----------------------------
+        // STEP 4: Draw the cached preview to the UI
+        // ----------------------------
 
-        RenderTexture.active = previewTexture;
-        Texture2D tempTexture = new Texture2D((int)previewWidth, (int)previewHeight, TextureFormat.RGB24, false);
-        tempTexture.ReadPixels(new Rect(0, 0, previewWidth, previewHeight), 0, 0);
-        tempTexture.Apply();
-        RenderTexture.active = null;
-
-        AddAllEffects(tempTexture);
-
-        GUILayout.Label(new GUIContent(tempTexture), GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
-        DestroyImmediate(tempTexture);
+        GUILayout.Label(new GUIContent(cachedPreviewTexture), GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
     }
+
+
 
     #endregion
 
