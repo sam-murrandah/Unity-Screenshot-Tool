@@ -1,9 +1,5 @@
 /*
 Made by Samuel Murrandah
-Student Number: 1031741
-Student Email: 1031741@student.sae.edu.au
-Class Code: GPG315
-Assignment: 1
 
 AI Declaration:
 Generative AI was used for editing and organisation such as reordering functions as well as some comments.
@@ -52,26 +48,40 @@ public class ScreenshotTool : EditorWindow
     private bool showAdvancedSettings = false;
     private bool showPostProcSettings = false;
 
+
     // UI Management
     private ScreenshotToolUI ui;
     #endregion
 
     #region Core Functions
     void OnGUI()
-    {
-        scrollPosition = ui.DrawScrollView(scrollPosition, position.width, position.height);
+{
+    scrollPosition = ui.DrawScrollView(scrollPosition, position.width, position.height);
 
-        ui.DrawHeader("Quick Screenshot Tool");
-        ui.DrawSaveSettings(ref showSaveSettings);
-        ui.DrawCaptureSettings(ref showCaptureSettings);
-        ui.DrawAdvancedSettings(ref showAdvancedSettings);
-        ui.DrawPostProcessingSettings(ref showPostProcSettings);
-        ui.DrawTakeScreenshotButton(SceneView.lastActiveSceneView);
-        ui.DrawLivePreview();
+    GUILayout.Space(10);
+    ui.DrawHeader("📸 Quick Screenshot Tool");
 
-        EditorGUILayout.EndScrollView();
-    }
-   
+    GUILayout.Space(10);
+    ui.DrawSaveSettings(ref showSaveSettings);
+
+    GUILayout.Space(10);
+    ui.DrawCaptureSettings(ref showCaptureSettings);
+
+    GUILayout.Space(10);
+    ui.DrawAdvancedSettings(ref showAdvancedSettings);
+
+    GUILayout.Space(10);
+    ui.DrawPostProcessingSettings(ref showPostProcSettings);
+
+    GUILayout.Space(10);
+    ui.DrawTakeScreenshotButton(SceneView.lastActiveSceneView);
+
+    GUILayout.Space(10);
+    ui.DrawLivePreview();
+
+    EditorGUILayout.EndScrollView();
+}
+
     [MenuItem("Tools/Quick Screenshot Tool")]
     public static void ShowWindow()
     {
